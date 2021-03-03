@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using ZigBeeNet.Security;
 using ZigBeeNet.ZCL.Field;
 using ZigBeeNet.ZDO;
@@ -12,9 +12,11 @@ namespace ZigBeeNet.ZCL.Protocol
     public class ZclDataType
     {
         private static Dictionary<int, ZclDataType> _codeTypeMapping;
+        private static ZclDataTypeDictionnary _codeTypeMappingKeyed = new ZclDataTypeDictionnary();
+        private static ZclDataTypeSquareArray _codeTypeMappingSquareArray = new ZclDataTypeSquareArray();
+
 
         internal Type DataClass { get; set; }
-
         public string Label { get; set; }
         public int Id { get; set; }
         public bool IsAnalog { get; set; }
@@ -73,7 +75,7 @@ namespace ZigBeeNet.ZCL.Protocol
             _codeTypeMapping[0x2F] = new ZclDataType("Signed 64-bit Integer", typeof(long), 0x2F, true, DataType.SIGNED_64_BIT_INTEGER);
             _codeTypeMapping[0x30] = new ZclDataType("8-bit Enumeration", typeof(byte), 0x30, false, DataType.ENUMERATION_8_BIT);
             _codeTypeMapping[0x31] = new ZclDataType("16-bit Enumeration", typeof(ushort), 0x31, false, DataType.ENUMERATION_16_BIT);
-            _codeTypeMapping[0x32] = new ZclDataType("32-bit Enumeration", typeof(uint), 0x32, false, DataType.ENUMERATION_32_BIT);
+            _codeTypeMapping[0x33] = new ZclDataType("32-bit Enumeration", typeof(uint), 0x33, false, DataType.ENUMERATION_32_BIT);
             _codeTypeMapping[0x38] = new ZclDataType("Semi precision float", typeof(float), 0x38, true, DataType.FLOAT_16_BIT);
             _codeTypeMapping[0x39] = new ZclDataType("Single precision float", typeof(float), 0x39, true, DataType.FLOAT_32_BIT);
             _codeTypeMapping[0x3A] = new ZclDataType("Double precision float", typeof(double), 0x3A, true, DataType.FLOAT_64_BIT);
@@ -130,6 +132,12 @@ namespace ZigBeeNet.ZCL.Protocol
             _codeTypeMapping[0xA1] = new ZclDataType("Unsigned 8 bit Integer Array", typeof(byte[]), 0x00, false, DataType.UNSIGNED_8_BIT_INTEGER_ARRAY);
             _codeTypeMapping[0xA2] = new ZclDataType("RAW_OCTET", typeof(ByteArray), 0x00, false, DataType.RAW_OCTET);
             _codeTypeMapping[0xA3] = new ZclDataType("ZigBee Data Type", typeof(ZclDataType), 0x00, false, DataType.ZIGBEE_DATA_TYPE);
+
+            foreach (var v in _codeTypeMapping.Values)
+            {
+                _codeTypeMappingKeyed.Add(v);
+                _codeTypeMappingSquareArray.Add(v);
+            }
         }
 
         public static ZclDataType Get(int id)
@@ -142,10 +150,64 @@ namespace ZigBeeNet.ZCL.Protocol
             return _codeTypeMapping.Values.Single(dt => dt.DataType == type);
         }
 
+        public static ZclDataType GetKeyedValue(DataType type)
+        {
+            return _codeTypeMappingKeyed[type];
+        }
+
+        public static ZclDataType GetSquareArray(DataType type)
+        {
+            return _codeTypeMappingSquareArray[type];
+        }
         public override string ToString()
         {
             return Label;
         }
+
+
+        private class ZclDataTypeDictionnary : KeyedCollection<DataType,ZclDataType>
+        {
+            protected override DataType GetKeyForItem(ZclDataType item)
+            {
+                return item.DataType ;
+            }
+        }
+
+        private class ZclDataTypeSquareArray : IEnumerable<ZclDataType>
+        {
+            ZclDataType[][] _values;
+
+            public ZclDataTypeSquareArray()
+            {
+                _values = new ZclDataType[16][];
+            }
+            public ZclDataTypeSquareArray(IEnumerable<ZclDataType> values) : this()
+            {
+                foreach (var v in values)
+                    Add(v);
+            }
+
+            public void Add(ZclDataType data)
+            {
+                int row = ((byte)data.DataType)>>4;
+                int column = ((byte)data.DataType) & 0x0f;
+                ZclDataType[] _row = _values[row] ?? (_values[row] = new ZclDataType[16]);
+                _row[column]=data;
+            }
+
+            public ZclDataType this[DataType data] => _values[((byte)data)>>4]?[((byte)data) & 0x0f];
+
+            IEnumerator<ZclDataType> IEnumerable<ZclDataType>.GetEnumerator()
+            {
+                for (int i=0;i<16;i++)
+                    for (int j=0;j<16;j++)
+                        if (_values[i]?[j]!=null)
+                            yield return _values[i][j];
+            }
+
+            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => ((IEnumerable<ZclDataType>)this).GetEnumerator();
+        }
+
     }
 }
 
