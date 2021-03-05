@@ -24,14 +24,17 @@ namespace benchmark
         [Benchmark]
         public ZclDataType Get() => ZclDataType.Get(data);
 
-        [Benchmark]
-        public ZclDataType GetDict() => ZclDataType.Get((byte)data);
+        // [Benchmark]
+        // public ZclDataType GetDict() => ZclDataType.Get((byte)data);
 
-        [Benchmark]
-        public ZclDataType GetKeyedValue() => ZclDataType.GetKeyedValue(data);
+        // [Benchmark]
+        // public ZclDataType GetKeyedValue() => ZclDataType.GetKeyedValue(data);
 
         [Benchmark]
         public ZclDataType GetSquareArray() => ZclDataType.GetSquareArray(data);
+
+        [Benchmark]
+        public ZclDataType GetArray() => ZclDataType.GetArray(data);
 
         static int pos = 0;
         private DataType data;
@@ -48,9 +51,9 @@ namespace benchmark
 
         static void Main(string[] args)
         {
-            foreach (var v in DataTypeValues.Values)
-                if (ZclDataType.Get(v) != ZclDataType.GetKeyedValue(v))
-                    throw new Exception($"ZclDataType is different for {v}!!!");
+            // foreach (var v in DataTypeValues.Values)
+            //     if (ZclDataType.Get(v) != ZclDataType.GetKeyedValue(v))
+            //         throw new Exception($"ZclDataType is different for {v}!!!");
 
             foreach (var v in DataTypeValues.Values)
                 if (ZclDataType.Get(v) != ZclDataType.GetSquareArray(v))
