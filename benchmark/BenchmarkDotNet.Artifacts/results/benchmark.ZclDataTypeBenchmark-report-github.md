@@ -8,9 +8,8 @@ Intel Core i5-5200U CPU 2.20GHz (Broadwell), 1 CPU, 4 logical and 2 physical cor
 
 
 ```
-|         Method |         Mean |      Error |     StdDev |
-|--------------- |-------------:|-----------:|-----------:|
-|            Get | 1,622.791 ns | 28.0654 ns | 28.8211 ns |
-|        GetDict |    15.973 ns |  0.2564 ns |  0.2273 ns |
-|  GetKeyedValue |    17.895 ns |  0.2803 ns |  0.2485 ns |
-| GetSquareArray |     2.333 ns |  0.0864 ns |  0.0765 ns |
+|         Method |          Mean |      Error |     StdDev |
+|--------------- |--------------:|-----------:|-----------:|
+|            Get | 1,464.3523 ns | 27.0953 ns | 52.2034 ns |
+| GetSquareArray |     2.3152 ns |  0.1468 ns |  0.1748 ns |
+|       GetArray |     0.3927 ns |  0.0864 ns |  0.0808 ns |
