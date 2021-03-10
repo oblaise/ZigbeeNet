@@ -19,8 +19,6 @@ namespace benchmark
             Count = Values.Length;
         }
     }
-
-    //[MemoryDiagnoser]
     public class ZclDataTypeBenchmark {
         [Benchmark]
         public ZclDataType Get() => ZclDataType.Get(data);
@@ -47,6 +45,19 @@ namespace benchmark
         }
     }
 
+
+    [MemoryDiagnoser]
+    public class ZclDataTypeBenchmarkMemory {
+        [Benchmark]
+        public void CreateDict() => ZclDataType.CreateDict();
+        [Benchmark]
+        public void CreateKeyedValue() => ZclDataType.CreateZclDataTypeDictionnary();
+        [Benchmark]
+        public void CreateArray() => ZclDataType.CreateZclDataTypeDirectArray();
+        [Benchmark]
+        public void CreateSquareArray() => ZclDataType.CreateZclDataTypeSquareArray();
+    }
+
     class Program
     {
 
@@ -65,7 +76,8 @@ namespace benchmark
                     throw new Exception($"ZclDataType is different for {v}!!!");
 
             // get all DataType values
-            var summary = BenchmarkRunner.Run<ZclDataTypeBenchmark>();
+            //var summary = BenchmarkRunner.Run<ZclDataTypeBenchmark>();
+            var summary = BenchmarkRunner.Run<ZclDataTypeBenchmarkMemory>();
 
         }
     }
