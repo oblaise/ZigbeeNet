@@ -20,15 +20,16 @@ namespace benchmark
         }
     }
 
+    //[MemoryDiagnoser]
     public class ZclDataTypeBenchmark {
         [Benchmark]
         public ZclDataType Get() => ZclDataType.Get(data);
 
-        // [Benchmark]
-        // public ZclDataType GetDict() => ZclDataType.Get((byte)data);
+        [Benchmark]
+        public ZclDataType GetDict() => ZclDataType.Get((byte)data);
 
-        // [Benchmark]
-        // public ZclDataType GetKeyedValue() => ZclDataType.GetKeyedValue(data);
+        [Benchmark]
+        public ZclDataType GetKeyedValue() => ZclDataType.GetKeyedValue(data);
 
         [Benchmark]
         public ZclDataType GetSquareArray() => ZclDataType.GetSquareArray(data);
@@ -57,6 +58,10 @@ namespace benchmark
 
             foreach (var v in DataTypeValues.Values)
                 if (ZclDataType.Get(v) != ZclDataType.GetSquareArray(v))
+                    throw new Exception($"ZclDataType is different for {v}!!!");
+
+            foreach (var v in DataTypeValues.Values)
+                if (ZclDataType.Get(v) != ZclDataType.GetArray(v))
                     throw new Exception($"ZclDataType is different for {v}!!!");
 
             // get all DataType values
